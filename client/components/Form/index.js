@@ -8,6 +8,7 @@ import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
 import RNModal from 'react-native-modal';
+import axios from 'axios';
 
 export default function Form() {
   const formValidationSchema = yup.object().shape({
@@ -38,9 +39,31 @@ export default function Form() {
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [confirmData, setConfirmData] = useState({});
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
+  };
+
+  const onPressConfirm = (data) => {
+    setModalVisible(!isModalVisible);
+    setConfirmData(data);
+  };
+
+  const onPressSubmit = async (resetForm) => {
+    try {
+      const response = await axios.post(
+        'http://192.168.101.9:5000/rentalz/createForm',
+        confirmData
+      );
+      console.log(response);
+      if (response.data) {
+        setModalVisible(!isModalVisible);
+        resetForm();
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -49,7 +72,7 @@ export default function Form() {
       <Formik
         initialValues={initialValues}
         validationSchema={formValidationSchema}
-        onSubmit={toggleModal}
+        onSubmit={onPressConfirm}
       >
         {({
           handleChange,
@@ -238,13 +261,19 @@ export default function Form() {
                     Reporter Name: {values.reporterName}
                   </Text>
                   <View style={styles.buttonModal}>
-                    <Button onPress={toggleModal} title="Cancel" />
                     <Button
-                      onPress={() => {
-                        resetForm(initialValues);
-                        setModalVisible(!isModalVisible);
+                      onPress={toggleModal}
+                      title="Cancel"
+                      buttonStyle={{
+                        backgroundColor: 'red',
                       }}
+                    />
+                    <Button
+                      onPress={() => onPressSubmit(resetForm)}
                       title="Submit"
+                      buttonStyle={{
+                        backgroundColor: 'green',
+                      }}
                     />
                   </View>
                 </View>
