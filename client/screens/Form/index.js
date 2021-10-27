@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, ScrollView } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  ScrollView,
+  ToastAndroid,
+  Platform,
+  AlertIOS,
+} from 'react-native';
 import { Button, Input } from 'react-native-elements';
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -15,7 +23,6 @@ export default function Form() {
     property: yup.string().required('Property is required'),
     bedroom: yup.string().required('Bedroom is required'),
     address: yup.string().required('Address is required'),
-    furniture: yup.string().required('Furniture is required'),
     pickDate: yup.date().required('Date is required'),
     rentalPrice: yup
       .number()
@@ -57,7 +64,18 @@ export default function Form() {
         confirmData
       );
       console.log(response);
-      if (response.data) {
+      if (Platform.OS === 'android') {
+        ToastAndroid.show(
+          response.data.message,
+          ToastAndroid.SHORT,
+          ToastAndroid.TOP,
+          30,
+          55
+        );
+      } else {
+        AlertIOS.alert(response.data.message);
+      }
+      if (response.data.message === 'Form created!') {
         setModalVisible(!isModalVisible);
         resetForm();
       }
@@ -189,11 +207,6 @@ export default function Form() {
                       />
                     </Picker>
                   </View>
-                  {errors.furniture && touched.furniture ? (
-                    <Text style={{ color: 'red', fontSize: 14 }}>
-                      {errors.furniture}
-                    </Text>
-                  ) : null}
                 </View>
 
                 <Input
@@ -237,6 +250,9 @@ export default function Form() {
               </View>
               <RNModal isVisible={isModalVisible} style={{ margin: 50 }}>
                 <View style={styles.modalView}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.modalTitle}>Confirmation?</Text>
+                  </View>
                   <Text style={styles.modalTextStyle}>
                     Property: {values.property}
                   </Text>
@@ -332,24 +348,25 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   modalView: {
-    justifyContent: 'center',
     flex: 1,
     maxHeight: '70%',
     backgroundColor: '#fff',
     paddingHorizontal: 10,
     borderRadius: 7,
-    paddingLeft: 12,
-    paddingTop: 15,
+    paddingTop: 10,
   },
   buttonModal: {
     paddingHorizontal: 70,
-    marginTop: 10,
     marginBottom: 10,
-    flex: 1,
-    justifyContent: 'space-around',
     flexDirection: 'row',
+    justifyContent: 'space-around',
+    padding: 5
   },
   modalTextStyle: {
     flex: 1,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 });
