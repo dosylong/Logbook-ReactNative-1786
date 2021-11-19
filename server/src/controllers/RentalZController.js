@@ -10,7 +10,7 @@ class RentalController {
         },
       });
       if (formAddressExist) {
-        return res.json({ message: 'Form address already exists' });
+        return res.json({ message: 'Address field already exists!' });
       }
 
       const createForm = await prisma.rental.create({
@@ -25,7 +25,7 @@ class RentalController {
           reporterName: req.body.reporterName,
         },
       });
-      return res.json(createForm);
+      return res.json({ ...createForm, message: 'Form created!' });
     } catch (error) {
       return next(error);
     }

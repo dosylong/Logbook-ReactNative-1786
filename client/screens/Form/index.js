@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  ScrollView,
-  ToastAndroid,
-  Platform,
-  AlertIOS,
-} from 'react-native';
+import { StyleSheet, View, Text, ScrollView, ToastAndroid } from 'react-native';
 import { Button, Input } from 'react-native-elements';
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -64,17 +56,13 @@ export default function Form() {
         confirmData
       );
       console.log(response);
-      if (Platform.OS === 'android') {
-        ToastAndroid.show(
-          response.data.message,
-          ToastAndroid.SHORT,
-          ToastAndroid.TOP,
-          30,
-          55
-        );
-      } else {
-        AlertIOS.alert(response.data.message);
-      }
+      ToastAndroid.showWithGravityAndOffset(
+        response.data.message,
+        ToastAndroid.SHORT,
+        ToastAndroid.TOP,
+        10,
+        110
+      );
       if (response.data.message === 'Form created!') {
         setModalVisible(!isModalVisible);
         resetForm();
@@ -276,20 +264,16 @@ export default function Form() {
                   <Text style={styles.modalTextStyle}>
                     Reporter Name: {values.reporterName}
                   </Text>
-                  <View style={styles.buttonModal}>
+                  <View style={styles.modalButton}>
                     <Button
+                      buttonStyle={styles.buttonCancel}
                       onPress={toggleModal}
                       title="Cancel"
-                      buttonStyle={{
-                        backgroundColor: 'red',
-                      }}
                     />
                     <Button
+                      buttonStyle={styles.buttonConfirm}
                       onPress={() => onPressSubmit(resetForm)}
                       title="Submit"
-                      buttonStyle={{
-                        backgroundColor: 'green',
-                      }}
                     />
                   </View>
                 </View>
@@ -355,12 +339,24 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     paddingTop: 10,
   },
-  buttonModal: {
-    paddingHorizontal: 70,
+  modalButton: {
     marginBottom: 10,
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: 5
+    justifyContent: 'space-between',
+    padding: 5,
+    paddingHorizontal: 20,
+  },
+  buttonCancel: {
+    backgroundColor: 'red',
+    borderRadius: 20,
+    marginTop: 10,
+    width: 120,
+  },
+  buttonConfirm: {
+    backgroundColor: 'green',
+    borderRadius: 20,
+    marginTop: 10,
+    width: 120,
   },
   modalTextStyle: {
     flex: 1,
